@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Trading Dashboard - Enhanced with Equities & OTC</title>
+    <style>
+        :root {
+            --futures-color: #3b82f6;
+            --commodities-color: #10b981;
+            --equities-color: #8b5cf6;
+            --otc-color: #f59e0b;
+            --options-color: #ec4899;
+            --dark: #0f172a;
+            --darker: #020617;
+            --light: #e2e8f0;
+            --card-bg: #1e293b;
+            --border: #334155;
+        }
+        
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+            color: var(--light);
+            min-height: 100vh;
+        }
+        
+        .container { 
+            max-width: 1600px; 
+            margin: 0 auto; 
+        }
+        
+        .header { 
+            background: var(--card-bg); 
+            padding: 30px; 
+            border-radius: 15px; 
+            margin-bottom: 30px; 
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin: 0 0 10px 0;
+            background: linear-gradient(135deg, var(--futures-color) 0%, var(--equities-color) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .header p {
+            color: #94a3b8;
+            margin: 0;
+        }
+        
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); 
+            gap: 25px; 
+            margin-bottom: 30px;
+        }
+        
+        .card { 
+            background: var(--card-bg); 
+            padding: 25px; 
+            border-radius: 12px; 
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card.futures {
+            border-top: 4px solid var(--futures-color);
+        }
+        
+        .card.commodities {
+            border-top: 4px solid var(--commodities-color);
+        }
+        
+        .card.equities {
+            border-top: 4px solid var(--equities-color);
+        }
+        
+        .card.otc {
+            border-top: 4px solid var(--otc-color);
+        }
+        
+        .card.options {
+            border-top: 4px solid var(--options-color);
+        }
+        
+        .card h3 { 
+            margin-top: 0; 
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card.futures h3 {
+            color: var(--futures-color);
+        }
+        
+        .card.commodities h3 {
+            color: var(--commodities-color);
+        }
+        
+        .card.equities h3 {
+            color: var(--equities-color);
+        }
+        
+        .card.otc h3 {
+            color: var(--otc-color);
+        }
+        
+        .card.options h3 {
+            color: var(--options-color);
+        }
+        
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 10px;
+        }
+        
+        th, td { 
+            padding: 12px 15px; 
+            text-align: left; 
+            border-bottom: 1px solid var(--border); 
+        }
+        
+        th { 
+            background: rgba(15, 23, 42, 0.5); 
+            color: #94a3b8;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        td { 
+            color: var(--light);
+        }
+        
+        .symbol {
+            font-weight: 700;
+            font-family: monospace;
+        }
+        
+        .price-up { color: #10b981; }
+        .price-down { color: #ef4444; }
+        
+        .setup-strong { color: #10b981; font-weight: 600; background: rgba(16, 185, 129, 0.1); padding: 2px 8px; border-radius: 4px; }
+        .setup-moderate { color: #f59e0b; font-weight: 600; background: rgba(245, 158, 11, 0.1); padding: 2px 8px; border-radius: 4px; }
+        .setup-weak { color: #94a3b8; font-weight: 600; background: rgba(148, 163, 184, 0.1); padding: 2px 8px; border-radius: 4px; }
+        
+        .timeframe {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            background: rgba(148, 163, 184, 0.1);
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-left: 5px;
+        }
+        
+        .summary { 
+            background: var(--card-bg); 
+            padding: 25px; 
+            border-radius: 12px; 
+            margin: 30px 0; 
+            border: 1px solid var(--border);
+            white-space: pre-line;
+            line-height: 1.6;
+        }
+        
+        .summary h3 {
+            color: var(--futures-color);
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        
+        .nav {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-btn {
+            background: var(--card-bg);
+            color: #94a3b8;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        
+        .nav-btn:hover {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--futures-color);
+            border-color: var(--futures-color);
+        }
+        
+        .nav-btn.active {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--futures-color);
+            border-color: var(--futures-color);
+        }
+        
+        .time-display {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            text-align: center;
+        }
+        
+        .section-header {
+            color: var(--equities-color);
+            font-size: 1.5rem;
+            margin: 40px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border);
+        }
+        
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            th, td {
+                padding: 8px 10px;
+            }
+            
+            .nav {
+                justify-content: center;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1><i class="fas fa-chart-line"></i> Trading Mission Control</h1>
+            <p>Futures, Equities, Commodities & OTC Analysis</p>
+            <div class="time-display">
+                <i class="fas fa-clock"></i> Last Updated: <span id="current-time">Loading...</span> | 
+                <i class="fas fa-calendar"></i> Date: 2026-04-18
+            </div>
+        </div>
+        
+        <!-- Navigation -->
+        <div class="nav">
+            <a href="http://45.32.195.189:8891/mission_control_index.html" class="nav-btn">
+                <i class="fas fa-home"></i> Mission Control Home
+            </a>
+            <a href="http://45.32.195.189:8891/trading_journal_dashboard.html" class="nav-btn">
+                <i class="fas fa-book"></i> Trading Journal
+            </a>
+            <a href="#" class="nav-btn active">
+                <i class="fas fa-chart-line"></i> Trading Dashboard
+            </a>
+            <a href="prop_firm_dashboard_complete.html" class="nav-btn">
+                <i class="fas fa-trophy"></i> Futures Prop Firm
+            </a>
+            <a href="options_prop_firm_complete.html" class="nav-btn">
+                <i class="fas fa-options"></i> Options Prop Firm
+            </a>
+        </div>
+        
+        <!-- Executive Summary -->
+        <div class="summary">
+            <h3><i class="fas fa-bullhorn"></i> Executive Summary</h3>
+            <strong>TRADING BRIEF - 2026-04-18</strong>
+            ==================================================
+            
+            <strong>MARKET THEME:</strong> AI momentum continues vs valuation concerns
+            <strong>S&P 500:</strong> 5250 (Bullish) | <strong>VIX:</strong> 15.5 (Low)
+            
+            <strong>EQUITIES FOCUS:</strong> Top 20 technical setups at key pivot points
+            <strong>OTC FOCUS:</strong> Best fundamental + technical opportunities
+            
+            <strong>TOP EQUITY SETUPS:</strong>
+            • NVDA: Weekly breakout above $950
+            • AAPL: Daily support at $170, RSI oversold
+            • AMD: 4H bull flag, target $200
+            • MSTR: Bitcoin proxy, weekly momentum
+            
+            <strong>BEST OTC:</strong> CBDD - EU distribution deal catalyst
+            <strong>OTC ENTRY:</strong> $0.0225 | <strong>STOP:</strong> $0.0169 | <strong>TARGET:</strong> $0.0450
+            
+            <strong>RECOMMENDED ACTIONS:</strong>
+            1. Trade equity breakouts from pivot points
+            2. Consider CBDD for OTC speculation
+            3. Monitor futures for day trading opportunities
+            4. Sell premium in high-IV commodities
+        </div>
+        
+        <!-- Section Header: Equities & OTC -->
+        <h2 class="section-header">
+            <i class="fas fa-chart-candle"></i> Equities & OTC Analysis
+        </h2>
+        
+        <!-- Main Grid -->
+        <div class="grid">
+            <!-- Top 20 Equity Setups -->
+            <div class="card equities">
+                <h3><i class="fas fa-star"></i> Top 20 Equity Setups</h3>
+                <p style="color: #94a3b8; margin-bottom: 15px;">Best technical setups at key pivot points (Daily/Weekly/4H)</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Symbol</th>
+                            <th>Price</th>
+                            <th>Setup</th>
+                            <th>Timeframe</th>
+                            <th>Pivot Level</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td class="symbol">NVDA</td><td>$945.50</td><td><span class="setup-strong">Weekly Breakout</span></td><td><span class="timeframe">WEEKLY</span></td><td>$950 resistance</td></tr>
+                        <tr><td class="symbol">AAPL</td><td>$172.25</td><td><span class="setup-strong">Daily Support</span></td><td><span class="timeframe">DAILY</span></td><td>$170 support</td></tr>
+                        <tr><td class="symbol">AMD</td><td>$185.75</td><td><span class="setup-strong">4H Bull Flag</span></td><td><span class="timeframe">4H</span></td><td>$180 breakout</td></tr>
+                        <tr><td class="symbol">MSTR</td><td>$1,450</td><td><span class="setup-strong">Weekly Momentum</span></td><td><span class="timeframe">WEEKLY</span></td><td>Bitcoin correlation</td></tr>
+                        <tr><td class="symbol">TSLA</td><td>$175.50</td><td><span class="setup-moderate">Daily Reversal</span></td><td><span class="timeframe">DAILY</span></td><td>$170 support</td></tr>
+                        <tr><td class="symbol">MSFT</td><td>$425.80</td><td><span class="setup-strong">4H Ascending Triangle</span></td><td><span class="timeframe">4H</span></td><td>$420 support</td></tr>
+                        <tr><td class="symbol">GOOGL</td><td>$155.25</td><td><span class="setup-moderate">Weekly Test</span></td><td><span class="timeframe">WEEKLY</span></td><td>$150 support</td></tr>
+                        <tr><td class="symbol">META</td><td>$485.50</td><td><span class="setup-strong">Daily Cup & Handle</span></td><td><span class="timeframe">DAILY</span></td><td>$480 breakout</td></tr>
+                        <tr><td class="symbol">AMZN</td><td>$182.75</td><td><span class="setup-moderate">4H Support</span></td><td><span class="timeframe">4H</span></td><td>$180 pivot</td></tr>
+                        <tr><td class="symbol">AVGO</td><td>$1,350</td><td><span class="setup-strong">Weekly Uptrend</span></td><td><span class="timeframe">WEEKLY</span></td><td>$1,300 support</td></tr>
+                        <tr><td class="symbol">LLY</td><td>$785.50</td><td><span class="setup-moderate">Daily Consolidation</span></td><td><span class="timeframe">DAILY</span></td><td>$780 pivot</td></tr>
+                        <tr><td class="symbol">BRK.B</td><td>$415.25</td><td><span class="setup-weak">Range Bound</span></td><td><span class="timeframe">DAILY</span></td><td>$410-420 range</td></tr>
+                        <tr><td class="symbol">JPM</td><td>$195.80</td><td><span class="setup-moderate">4H Breakout</span></td><td><span class="timeframe">4H</span></td><td>$195 resistance</td></tr>
+                        <tr><td class="symbol">V</td><td>$275.50</td><td><span class="setup-weak">Testing Support</span></td><td><span class="timeframe">DAILY</span></td><td>$270 support</td></tr>
+                        <tr><td class="symbol">MA</td><td>$465.25</td><td><span class="setup-moderate">Weekly Bounce</span></td><td><span class="timeframe">WEEKLY</span></td><td>$460 support</td></tr>
+                        <tr><td class="symbol">UNH</td><td>$485.75</td><td><span class="setup-weak">Downtrend</span></td><td><span class="timeframe">DAILY</span></td><td>$490 resistance</td></tr>
+                        <tr><td class="symbol">HD</td><td>$355.50</td><td><span class="setup-moderate">4H Reversal</span></td><td><span class="timeframe">4H</span></td><td>$350 support</td></tr>
+                        <tr><td class="symbol">BAC</td><td>$37.25</td><td><span class="setup-weak">Consolidation</span></td><td><span class="timeframe">DAILY</span></td><td>$36-38 range</td></tr>
+                        <tr><td class="symbol">PFE</td><td>$27.50</td><td><span class="setup-strong">Weekly Bottom</span></td><td><span class="timeframe">WEEKLY</span></td><td>$26 support</td></tr>
+                        <tr><td class="symbol">DIS</td><td>$102.75</td><td><span class="setup-moderate">Daily Breakout</span></td><td><span class="timeframe">DAILY</span></td><td>$100 resistance</td></tr>
+                    </tbody>
+                </table>
+                <p style

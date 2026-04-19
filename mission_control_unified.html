@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Mission Control Unified Dashboard</title>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --secondary: #10b981;
+            --accent: #8b5cf6;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --dark: #1e293b;
+            --light: #f8fafc;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--dark);
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .header p {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+        
+        .card.trading::before {
+            background: linear-gradient(90deg, #10b981, #3b82f6);
+        }
+        
+        .card.analysis::before {
+            background: linear-gradient(90deg, #8b5cf6, #ec4899);
+        }
+        
+        .card.mission::before {
+            background: linear-gradient(90deg, #f59e0b, #ef4444);
+        }
+        
+        .card.utilities::before {
+            background: linear-gradient(90deg, #06b6d4, #3b82f6);
+        }
+        
+        .card h2 {
+            color: var(--dark);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+        }
+        
+        .card h2 .icon {
+            font-size: 1.8rem;
+        }
+        
+        .feature-list {
+            list-style: none;
+        }
+        
+        .feature-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .feature-list .status {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .status.online {
+            background: var(--secondary);
+            box-shadow: 0 0 10px var(--secondary);
+        }
+        
+        .status.offline {
+            background: var(--danger);
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .btn:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: var(--secondary);
+        }
+        
+        .btn-secondary:hover {
+            background: #059669;
+        }
+        
+        .btn-accent {
+            background: var(--accent);
+        }
+        
+        .btn-accent:hover {
+            background: #7c3aed;
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+        }
+        
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .system-status {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .system-status h2 {
+            color: var(--dark);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .status-item {
+            background: var(--light);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .status-item.online {
+            border-left-color: var(--secondary);
+        }
+        
+        .status-item.offline {
+            border-left-color: var(--danger);
+        }
+        
+        .status-item h3 {
+            font-size: 1rem;
+            color: #64748b;
+            margin-bottom: 10px;
+        }
+        
+        .status-item .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+        
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+        
+        .action-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+        
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+        }
+        
+        .action-card .icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+        
+        .action-card h3 {
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+        
+        .action-card p {
+            color: #64748b;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Mission Control Unified Dashboard</h1>
+            <p>Complete trading automation platform with real-time data, technical analysis, and risk management</p>
+        </div>
+        
+        <!-- Main Dashboard Grid -->
+        <div class="dashboard-grid">
+            <!-- Trading Systems -->
+            <div class="card trading">
+                <h2><span class="icon">📈</span> Trading Systems</h2>
+                <ul class="feature-list">
+                    <li><span class="status online"></span> Tastytrade Real Account Integration</li>
+                    <li><span class="status online"></span> 4 Live Brokerage Accounts</li>
+                    <li><span class="status online"></span> Real-time Market Quotes</li>
+                    <li><span class="status online"></span> Portfolio Positions Tracking</li>
+                    <li><span class="status online"></span> Account-Specific Risk Rules</li>
+                </ul>
+                <div class="btn-group">
+                    <a href="/tastytrade_real_dashboard.html" class="btn">🎯 Real Account Dashboard</a>
+                    <a href="/tastytrade_charts.html" class="btn btn-secondary">📊 Technical Charts</a>
+                </div>
+            </div>
+            
+            <!-- Technical Analysis -->
+            <div class="card analysis">
+                <h2><span class="icon">📊</span> Technical Analysis</h2>
+                <ul class="feature-list">
+                    <li><span class="status online"></span> Real-time Price Charts</li>
+                    <li><span class="status online"></span> RSI & Moving Averages</li>
+                    <li><span class="status online"></span> Market News & Summaries</li>
+                    <li><span class="status online"></span> Multiple Timeframes</li>
+                    <li><span class="status online"></span> Futures & Commodities Data</li>
+                </ul>
+                <div class="btn-group">
+                    <a href="/tastytrade_tech_analysis.html" class="btn">🔍 Advanced Analysis</a>
+                    <a href="/test_tastytrade_local.html" class="btn btn-secondary">🧪 API Testing</a>
+                </div>
+            </div>
+            
+            <!-- Mission Control -->
+            <div class="card mission">
+                <h2><span class="icon">🏢</span> Mission Control</h2>
+                <ul class="feature-list">
+                    <li><span class="status online"></span> Unified Dashboard Interface</li>
+                    <li><span class="status online"></span> Trading Journal & Logging</li>
+                    <li><span class="status online"></span> Google Drive Integration</li>
+                    <li><span class="status online"></span> Automated Market Scans</li>
+                    <li><span class="status online"></span> Risk Management Tools</li>
+                </ul>
+                <div class="btn-group">
+                    <a href="/mission_control_sidebar.html" class="btn">🚀 Open Mission Control</a>
+                    <a href="/mission_control_index.html" class="btn btn-secondary">📋 System Status</a>
+                    <a href="/ibkr_dashboard.html" class="btn btn-success">🏦 IBKR Dashboard</a>
+                </div>
+            </div>
+            
+            <!-- Utilities -->
+            <div class="card utilities">
+                <h2><span class="icon">⚙️</span> System Utilities</h2>
+                <ul class="feature-list">
+                    <li><span class="status online"></span> Tastytrade API Proxy (8765)</li>
+                    <li><span class="status online"></span> IBKR API Proxy (8766)</li>
+                    <li><span class="status online"></span> Trading Journal API (5001)</li>
+                    <li><span class="status online"></span> Google Drive Website (8888)</li>
+                    <li><span class="status online"></span> Mission Control Web (8891)</li>
+                    <li><span class="status online"></span> Automated Cron Jobs</li>
+                </ul>
+                <div class="btn-group">
+                    <button onclick="testAllServices()" class="btn">🔧 Test All Services</button>
+                    <button onclick="showSystemInfo()" class="btn btn-secondary">📊 System Info</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- System Status -->
+        <div class="system-status">
+            <h2><span class="icon">📡</span> Live System Status</h2>
+            <div class="status-grid" id="status-grid">
+                <div class="status-item online">
+                    <h3>Tastytrade Proxy</h3>
+                    <div class="value">Online</div>
+                    <div class="detail">Port 8765 • Real Account Data</div>
+                </div>
+                <div class="status-item online">
+                    <h3>Mission Control</h3>
+                    <div class="value">Online</div>
+                    <div class="detail">Port 8891 • Unified Dashboard</div>
+                </div>
+                <div class="status-item online">
+                    <h3>Trading Journal</h3>
+                    <div class="value">Online</div>
+                    <div class="detail">Port 5001 • Trade Logging</div>
+                </div>
+                <div class="status-item online">
+                    <h3>Google Drive</h3>
+                    <div class="value">Online</div>
+                    <div class="detail">Port 8888 • File Storage</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <div class="action-card">
+                <span class="icon">🎯</span>
+                <h3>Quick Trading</h3>
+                <p>Access real account data and execute trades</p>
+                <a href="/tastytrade_real_dashboard.html" class="btn">Trade Now</a>
+            </div>
+            
+            <div class="action-card">
+                <span class="icon">📈</span>
+                <h3>Market Analysis</h3>
+                <p>Technical charts and market intelligence</p>
+                <a href="/tastytrade_charts.html" class="btn">Analyze</a>
+            </div>
+            
+            <div class="action-card">
+                <span class="icon">🏢</span>
+                <h3>Mission Control</h3>
+                <p>Complete trading automation platform</p>
+                <a href="/mission_control_sidebar.html" class="btn">Launch</a>
+            </div>
+            
+            <div class="action-card">
+                <span class="icon">⚙️</span>
+                <h3>System Settings</h3>
+                <p>Configure and monitor all services</p>
+                <button onclick="showSystemInfo()" class="btn">Configure</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Test all services
+        async function testAllServices() {
+            const services = [
+                { name: 'Tastytrade Proxy', url: 'http://localhost:8765/api/health' },
+                { name: 'Mission Control', url: 'http://localhost:8891' },
+                { name: 'Trading Journal', url: 'http://localhost:5001/api/trading-journal/health' },
+                { name: 'Google Drive', url: 'http://localhost:8888' }
+            ];
+            
+            let results = [];
+            
+            for (const service of services) {
+                try {
+                    const response = await fetch(service.url, { method: 'HEAD', mode: 'no-cors' });
+                    results.push(`✅ ${service.name}: ONLINE`);
+                } catch (error) {
+                    try {
+                        // Try with timeout
+                        const controller = new AbortController();
+                        const timeoutId = setTimeout(() => controller.abort(), 3000);
+                        
+                        const response = await fetch(service.url, { 
+                            signal: controller.signal,
+                            mode: 'no-cors'
+                        });
+                        clearTimeout(timeoutId);
+                        results.push(`✅ ${service.name}: ONLINE`);
+                    } catch {
+                        results.push(`❌ ${service.name}: OFFLINE`);
+                    }
+                }
+            }
+            
+            alert('Service Status:\n\n' + results.join('\n'));
+        }
+        
+        // Show system information
+        function showSystemInfo() {
+            const info = `
+                🚀 Mission Control System Information
+                
+                📊 Active Services:
+                • Tastytrade Proxy: http://localhost:8765
+                • Mission Control: http://localhost:8891
+                • Trading Journal: http://localhost:5001
+                • Google Drive: http://localhost:8888
+                
+                🔗 Quick Links:
+                • Unified Dashboard: /mission_control_unified.html
+                • Real Trading: /tastytrade_real_dashboard.html
+                • Technical Charts: /tastytrade_charts.html
+                • Mission Control: /mission_control_sidebar.html
+                
+                📁 Workspace: /root/.openclaw/workspace
+                
+                ⚡ System: Linux VPS • 2GB RAM • 50GB SSD
+                
+                🎯 Status: ALL SYSTEMS OPERATIONAL
+            `;
+            
+            alert(info);
+        }
+        
+        // Auto-update status will be handled by external JS
+    </script>
+    
+    <script src="/unified_dashboard.js"></script>
+</body>
+</html>

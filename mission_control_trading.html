@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Trading Dashboard - 2026-04-18</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #0f172a; color: #e2e8f0; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .header { background: #1e293b; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .card { background: #1e293b; padding: 20px; border-radius: 10px; border: 1px solid #334155; }
+        .card h3 { margin-top: 0; color: #60a5fa; }
+        .risk-high { color: #f87171; }
+        .risk-medium { color: #fbbf24; }
+        .risk-low { color: #34d399; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 8px; text-align: left; border-bottom: 1px solid #334155; }
+        th { background: #0f172a; }
+        .summary { background: #1e293b; padding: 20px; border-radius: 10px; margin: 20px 0; white-space: pre-line; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Trading Mission Control</h1>
+            <p>Date: 2026-04-18 | Generated: 11:00</p>
+        </div>
+        
+        <div class="summary">
+            <h3>Executive Summary</h3>
+            TRADING BRIEF - 2026-04-18<br>==================================================<br><br>MARKETS: S&P 5250 (Bullish), VIX 15.5 (Low)<br>THEME: AI momentum vs valuation concerns<br><br>TOP TRADES:<br>- Commodity ZC: Sell OTM Puts<br>- Equity AMD: Buy Shares + Covered Calls<br>- Options TSLA: Bull Put Spread<br>- Commodity OJ: Iron Condor<br><br>HIGH WEATHER RISK:<br>- KC: High - Monitor Brazilian frost<br>- OJ: Very High - High IV - premium sell<br><br>HIGH IV OPPORTUNITIES:<br>- OJ: 35% (High) - Premium selling<br>- KC: 30% (High) - Weather plays<br>- NVDA: 45% (Very High) - Wait for drop<br>
+        </div>
+        
+        <div class="grid">
+            <div class="card">
+                <h3>📈 Market Overview</h3>
+                <p><strong>S&P 500:</strong> 5250 (Bullish)</p>
+                <p><strong>Nasdaq:</strong> 18100 (Bullish)</p>
+                <p><strong>VIX:</strong> 15.5 (Low)</p>
+            </div>
+            
+            <div class="card">
+                <h3>🌾 Commodities</h3>
+                <table>
+                    <tr><th>Symbol</th><th>Price</th><th>Risk</th><th>Action</th></tr><tr><td>KC</td><td>$180.50</td><td class="risk-high">High</td><td>Monitor Brazilian frost</td></tr><tr><td>SB</td><td>$18.75</td><td class="risk-medium">Medium</td><td>Consider calls</td></tr><tr><td>ZC</td><td>$450.25</td><td class="risk-low">Low</td><td>Sell OTM puts</td></tr><tr><td>ZS</td><td>$1150.80</td><td class="risk-medium">Medium</td><td>Watch weather</td></tr><tr><td>OJ</td><td>$320.75</td><td class="risk-very-high">Very High</td><td>High IV - premium sell</td></tr></table>
+            </div>
+            
+            <div class="card">
+                <h3>📈 Equities</h3>
+                <table>
+                    <tr><th>Symbol</th><th>Action</th><th>IV</th><th>Reason</th></tr><tr><td>AAPL</td><td>WATCH</td><td>25%</td><td>Testing 200-day MA</td></tr><tr><td>NVDA</td><td>AVOID</td><td>45%</td><td>Extended, high IV</td></tr><tr><td>TSLA</td><td>CONSIDER</td><td>35%</td><td>Oversold bounce</td></tr><tr><td>AMD</td><td>BUY</td><td>30%</td><td>Breakout above $180</td></tr><tr><td>MSTR</td><td>SPECULATE</td><td>65%</td><td>Bitcoin proxy</td></tr></table>
+            </div>
+            
+            <div class="card">
+                <h3>💡 Trade Ideas</h3>
+                <table>
+                    <tr><th>Type</th><th>Symbol</th><th>Strategy</th></tr><tr><td>Commodity</td><td>ZC</td><td>Sell OTM Puts</td></tr><tr><td>Equity</td><td>AMD</td><td>Buy Shares + Covered Calls</td></tr><tr><td>Options</td><td>TSLA</td><td>Bull Put Spread</td></tr><tr><td>Commodity</td><td>OJ</td><td>Iron Condor</td></tr></table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClaw Mission Control v2</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        }
+        
+        body {
+            background: #0f172a;
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background: #1e293b;
+            position: fixed;
+            height: 100vh;
+            padding: 20px;
+            border-right: 1px solid #334155;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-align: center;
+            background: linear-gradient(135deg, #60a5fa, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .nav-item {
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+        }
+        
+        .nav-item:hover {
+            background: #334155;
+        }
+        
+        .nav-item.active {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .nav-icon {
+            margin-right: 12px;
+            font-size: 1.2rem;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #334155;
+        }
+        
+        .header h1 {
+            font-size: 1.8rem;
+        }
+        
+        .time-display {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #334155;
+        }
+        
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .card-icon {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .task {
+            background: #0f172a;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 3px solid #3b82f6;
+        }
+        
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .task-title {
+            font-weight: 500;
+        }
+        
+        .task-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status-todo {
+            background: #f59e0b;
+            color: #78350f;
+        }
+        
+        .status-in-progress {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .status-done {
+            background: #10b981;
+            color: #064e3b;
+        }
+        
+        .task-description {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin-bottom: 8px;
+        }
+        
+        .task-footer {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+        
+        .agent-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .agent {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: #0f172a;
+            border-radius: 8px;
+        }
+        
+        .agent-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .agent-info {
+            flex: 1;
+        }
+        
+        .agent-name {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        
+        .agent-role {
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+        
+        .agent-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status-online {
+            background: #10b981;
+            color: #064e3b;
+        }
+        
+        .status-standby {
+            background: #94a3b8;
+            color: #0f172a;
+        }
+        
+        .memory-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .stat {
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #60a5fa;
+            margin-bottom: 4px;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #94a3b8;
+        }
+        
+        .error {
+            text-align: center;
+            padding: 40px;
+            color: #ef4444;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                border-right: none;
+                border-bottom: 1px solid #334155;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">🦞 Mission Control</div>
+        <div class="nav-item active" data-screen="dashboard">
+            <span class="nav-icon">📊</span>
+            Dashboard
+        </div>
+        <div class="nav-item" data-screen="tasks">
+            <span class="nav-icon">📋</span>
+            Task Board
+        </div>
+        <div class="nav-item" data-screen="memory">
+            <span class="nav-icon">🧠</span>
+            Memory
+        </div>
+        <div class="nav-item" data-screen="agents">
+            <span class="nav-icon">👥</span>
+            Team
+        </div>
+        <div class="nav-item" data-screen="projects">
+            <span class="nav-icon">🚀</span>
+            Projects
+        </div>
+        <div class="nav-item" data-screen="calendar">
+            <span class="nav-icon">📅</span>
+            Calendar
+        </div>
+    </div>
+    
+    <div class="main-content">
+        <div class="header">
+            <h1 id="screen-title">Dashboard</h1>
+            <div class="time-display" id="current-time">Loading...</div>
+        </div>
+        
+        <div id="dashboard-screen" class="screen active">
+            <div class="dashboard-grid">
+                <!-- Tasks Card -->
+                <div class="card">
+                    <div class="card-title">
+                        <span class="card-icon">📋</span>
+                        Active Tasks
+                    </div>
+                    <div class="task-list" id="tasks-list">
+                        <div class="loading">Loading tasks...</div>
+                    </div>
+                </div>
+                
+                <!-- Agents Card -->
+                <div class="card">
+                    <div class="card-title">
+                        <span class="card-icon">👥</span>
+                        Agent Team
+                    </div>
+                    <div class="agent-list" id="agents-list">
+                        <div class="loading">Loading agents...</div>
+                    </div>
+                </div>
+                
+                <!-- Memory Stats Card -->
+                <div class="card">
+                    <div class="card-title">
+                        <span class="card-icon">🧠</span>
+                        Memory System
+                    </div>
+                    <div class="memory-stats" id="memory-stats">
+                        <div class="loading">Loading memory stats...</div>
+                    </div>
+                </div>
+                
+                <!-- System Status Card -->
+                <div class="card">
+                    <div class="card-title">
+                        <span class="card-icon">⚙️</span>
+                        System Status
+                    </div>
+                    <div id="system-status">
+                        <div class="loading">Loading system status...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="tasks-screen" class="screen" style="display: none;">
+            <div class="card">
+                <div class="card-title">
+                    <span class="card-icon">📋</span>
+                    Task Board
+                </div>
+                <div id="full-task-list">
+                    <div class="loading">Loading full task board...</div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="memory-screen" class="screen" style="display: none;">
+            <div class="card">
+                <div class="card-title">
+                    <span class="card-icon">🧠</span>
+                    Memory Browser
+                </div>
+                <div id="memory-browser">
+                    <div class="loading">Loading memory browser...</div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="agents-screen" class="screen" style="display: none;">
+            <div class="card">
+                <div class="card-title">
+                    <span class="card-icon">👥</span>
+                    Agent Team
+                </div>
+                <div id="full-agent-list">
+                    <div class="loading">Loading full agent list...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API endpoints
+        const API_BASE = './api/';
+        const ENDPOINTS = {
+            tasks: 'tasks.json',
+            agents: 'agents.json',
+            memory: 'memory.json',
+            projects: 'projects.json'
+        };
+        
+        // State
+        let currentScreen = 'dashboard';
+        
+        // DOM elements
+        const screens = {
+            dashboard: document.getElementById('dashboard-screen'),
+            tasks: document.getElementById('tasks-screen'),
+            memory: document.getElementById('memory-screen'),
+            agents: document.getElementById('agents-screen'),
+            projects: document.getElementById('projects-screen'),
+            calendar: document.getElementById('calendar-screen')
+        };
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            setupNavigation();
+            updateTime();
+            loadDashboardData();
+            setInterval(updateTime, 1000);
+            setInterval(loadDashboardData, 30000); // Refresh every 30 seconds
+        });
+        
+        // Navigation
+        function setupNavigation() {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const screen = item.dataset.screen;
+                    switchScreen(screen);
+                });
+            });
+        }
+        
+        function switchScreen(screen) {
+            // Update active nav item
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.dataset.screen === screen) {
+                    item.classList.add('active');
+                }
+            });
+            
+            // Update screen title
+            document.getElementById('screen-title').textContent = 
+                screen.charAt(0).toUpperCase() + screen.slice(1);
+            
+            // Hide all screens
+            Object.values(screens).forEach(s => {
+                if (s) s.style.display = 'none';
+            });
+            
+            // Show selected screen
+            if (screens[screen]) {
+                screens[screen].style.display = 'block';
+            }
+            
+            // Load screen data
+            currentScreen = screen;
+            if (screen === 'dashboard') {
+                loadDashboardData();
+            } else if (screen === 'tasks') {
+                loadTasks();
+            } else if (screen === 'agents') {
+                loadAgents();
+            } else if (screen === 'memory') {
+                loadMemory();
+            }
+        }
+        
+        // Time display
+        function updateTime() {
+            const now = new Date();
+            const options = { 
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                timeZoneName: 'short'
+            };
+            document.getElementById('current-time').textContent = 
+                now.toLocaleTimeString('en-US', options);
+        }
+        
+        // Data loading
+        async function fetchData(endpoint) {
+            try {
+                const response = await fetch(`${API_BASE}${endpoint}`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                return await response.json();
+            } catch (error) {
+                console.error(`Error fetching ${endpoint}:`, error);
+                return null;
+            }
+        }
+        
+        // Dashboard data
+        async function loadDashboardData() {
+            // Load tasks
+            const tasksData = await fetchData(ENDPOINTS.tasks);
+            if (tasksData?.data?.tasks) {
+                renderTasks(tasksData.data.tasks.slice(0, 3), 'tasks-list');
+            }
+            
+            // Load agents
+            const agentsData = await fetchData(ENDPOINTS.agents);
+            if (agentsData?.data?.agents) {
+                renderAgents(agentsData.data.agents, 'agents-list');
+            }
+            
+            // Load memory stats
+            const memoryData = await fetchData(ENDPOINTS.memory);
+            if (memoryData?.data?.memory_bank) {
+                renderMemoryStats(memoryData.data.memory_bank);
+            }
+            
+            // Update system status
+            updateSystemStatus();
+        }
+        
+        // Tasks
+        async function loadTasks() {
+            const data = await fetchData(ENDPOINTS.tasks);
+            if (data?.data?.tasks) {
+                renderTasks(data.data.tasks, 'full-task-list');
+            }
+        }
+        
+        function renderTasks(tasks, containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            if (!tasks.length) {
+                container.innerHTML = '<div class="error">No tasks found</div>';
+                return;
+            }
+            
+            container.innerHTML = tasks.map(task => `
+                <div class="task">
+                    <div class="task-header">
+                        <div class="task-title">${task.title}</div>
+                        <div class="task-status status-${task.status.replace('_', '-')}">
+                            ${task.status.replace('_', ' ')}
+                        </div>
+                    </div>
+                    <div class="task-description">${task.description}</div>
+                    <div class="task-footer">
+                        <span>Assignee: ${task.assignee}</span>
+                        <span>Priority: ${task.priority}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Agents
+        async function loadAgents() {
+            const data = await fetchData(ENDPOINTS.agents);
+            if (data?.data?.agents) {
+                renderAgents(data.data.agents, 'full-agent-list');
+            }
+        }
+        
+        function renderAgents(agents, containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            if (!agents.length) {
+                container.innerHTML = '<div class="error">No agents found</div>';
+                return;
+            }
+            
+            container.innerHTML = agents.map(agent => `
+                <div class="agent">
+                    <div class="agent-avatar">${agent.name.charAt(0)}</div>
+                    <div class="agent-info">
+                        <div class="agent-name">${agent.name}</div>
+                        <div class="agent-role">${agent.role} • ${agent.model}</div>
+                    </div>
+                    <div class="agent-status status-${agent.status}">
+                        ${agent.status}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Memory stats
+        function renderMemoryStats(memoryBank) {
+            const container = document.getElementById('memory-stats');
+            if (!container) return;
+            
+            container.innerHTML = `
+                <div class="stat">
+                    <div class="stat-value">${memoryBank.total_files}</div>
+                    <div class="stat-label">Total Files</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">${Object.keys(memoryBank.categories).length}</div>
+                    <div class="stat-label">Categories</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">${memoryBank.categories.conversations?.count || 0}</div>
+                    <div class="stat-label">Conversations</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">${memoryBank.categories.projects?.count || 0}</div>
+                    <div class="stat-label">Projects</div>
+                </div>
+            `;
+        }
+        
+        // Memory browser
+        async function loadMemory() {
+            const data = await fetchData(ENDPOINTS.memory);
+            const container = document.getElementById('memory-browser');
+            if (!container) return;
+            
+            if (!data?.data?.memory_bank) {
+                container.innerHTML = '<div class="error">Could not load memory data</div>';
+                return;
+            }
+            
+            const categories = data.data.memory_bank.categories;
+            let html = '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">';
+            
+            for (const [category, info] of Object.entries(categories)) {
+                html += `
+                    <div class="card" style="padding: 15px;">
+                        <div style="font-weight: 600; margin-bottom: 10px; text-transform: capitalize;">
+                            ${category} (${info.count})
+                        </div>
+                        <div style="font-size: 0.9rem; color: #94a3b8;">
+                            ${info.files.map(file => `<div style="margin-bottom: 5px;">${file}</div>`).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+        
+        // System status
+        function updateSystemStatus() {
+            const container = document.getElementById('system-status');
+            if (!container) return;
+            
+            const now = new Date();
+            const nextHeartbeat = new Date(now);
+            nextHeartbeat.setMinutes(nextHeartbeat.getMinutes() + 30 - (nextHeartbeat.getMinutes() % 30));
+            
+            container.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 15px;">
+                    <div class="stat">
+                        <div class="stat-value">✅</div>
+                        <div class="stat-label">Heartbeat Active</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">5</div>
+                        <div class="stat-label">Models</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">${nextHeartbeat.getHours().toString().padStart(2, '0')}:${nextHeartbeat.getMinutes().toString().padStart(2, '0')}</div>
+                        <div class="stat-label">Next Heartbeat</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">2</div>
+                        <div class="stat-label">Agents</div>
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
