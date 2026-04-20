@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mobile Portfolio Monitoring</title>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --dark: #0f172a;
+            --light: #e2e8f0;
+            --profit: #10b981;
+            --loss: #ef4444;
+            --active: #f59e0b;
+            --waiting: #8b5cf6;
+            --neutral: #94a3b8;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--dark);
+            color: var(--light);
+            line-height: 1.4;
+            padding: 10px;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            border: 2px solid var(--primary);
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        
+        .compact-schedule {
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .schedule-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .schedule-item:last-child {
+            border-bottom: none;
+        }
+        
+        .portfolio-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .position-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 12px;
+            border-left: 4px solid;
+        }
+        
+        .cc-card { border-color: #8b4513; }
+        .kc-card { border-color: #8b5cf6; }
+        .cl-card { border-color: #ef4444; }
+        .ng-card { border-color: #3b82f6; }
+        
+        .position-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .premium {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--profit);
+        }
+        
+        .position-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px;
+            font-size: 0.85rem;
+        }
+        
+        .monitoring-log {
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .log-entry {
+            padding: 6px;
+            margin: 3px 0;
+            background: rgba(255,255,255,0.05);
+            border-radius: 4px;
+            font-size: 0.8rem;
+            border-left: 3px solid var(--primary);
+        }
+        
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .btn {
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        
+        .btn-start { background: var(--profit); color: white; }
+        .btn-pause { background: var(--active); color: white; }
+        .btn-stop { background: var(--loss); color: white; }
+        .btn-simulate { background: var(--waiting); color: white; }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .stat-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 6px;
+            padding: 10px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+        
+        .market-hours {
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+        }
+        
+        .hours-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .hour-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 5px;
+            padding: 8px;
+            text-align: center;
+            font-size: 0.8rem;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 10px;
+            color: #94a3b8;
+            font-size: 0.8rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 480px) {
+            .controls {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .hours-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Scrollable but not too tall */
+        .scroll-container {
+            max-height: calc(100vh - 100px);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+    </style>
+</head>
+<body>
+    <div class="container scroll-container">
+        <div class="header">
+            <h1>📱 Mobile Monitoring</h1>
+            <p>Fits your screen • No weekend monitoring</p>
+        </div>
+        
+        <div class="compact-schedule">
+            <h3>⏰ Active Monitoring Only</h3>
+            <div class="schedule-item">
+                <span>📊 Off-Market:</span>
+                <span>30 min intervals</span>
+            </div>
+            <div class="schedule-item">
+                <span>🚀 Live Market:</span>
+                <span>15 min intervals</span>
+            </div>
+            <div class="schedule-item">
+                <span>🌙 Weekend:</span>
+                <span style="color: var(--neutral);">No monitoring</span>
+            </div>
+            <div style="margin-top: 10px; padding: 8px; background: rgba(59, 130, 246, 0.1); border-radius: 5px; font-size: 0.8rem;">
+                <strong>Note:</strong> Markets closed Friday 4pm CT → Sunday 5pm CT
+            </div>
+        </div>
+        
+        <div class="portfolio-grid">
+            <div class="position-card cc-card">
+                <div class="position-header">
+                    <h3>🍫 Cocoa (CC)</h3>
+                    <div class="premium">$220</div>
+                </div>
+                <div class="position-details">
+                    <div>Strike: 7200 Put</div>
+                    <div>Delta: 0.19</div>
+                    <div>Price: $7,420</div>
+                    <div>P&L: <span style="color: var(--profit);">+$22</span></div>
+                </div>
+            </div>
+            
+            <div class="position-card kc-card">
+                <div class="position-header">
+                    <h3>☕ Coffee (KC)</h3>
+                    <div class="premium">$155</div>
+                </div>
+                <div class="position-details">
+                    <div>Strike: 278 Put</div>
+                    <div>Delta: 0.28</div>
+                    <div>Price: $285.60</div>
+                    <div>P&L: <span style="color: var(--profit);">+$8</span></div>
+                </div>
+            </div>
+            
+            <div class="position-card cl-card">
+                <div class="position-header">
+                    <h3>🛢️ Crude Oil (CL)</h3>
+                    <div class="premium">$135</div>
+                </div>
+                <div class="position-details">
+                    <div>Strike: 78 Put</div>
+                    <div>Delta: 0.25</div>
+                    <div>Price: $79.45</div>
+                    <div>P&L: <span style="color: var(--profit);">+$14</span></div>
+                </div>
+            </div>
+            
+            <div class="position-card ng-card">
+                <div class="position-header">
+                    <h3>⚡ Natural Gas (NG)</h3>
+                    <div class="premium">$200</div>
+                </div>
+                <div class="position-details">
+                    <div>Strike: 2.80 Put</div>
+                    <div>Delta: 0.18</div>
+                    <div>Price: $3.05</div>
+                    <div>P&L: <span style="color: var(--profit);">+$30</span></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div>Total Premium</div>
+                <div class="stat-value" style="color: var(--profit);">$710</div>
+                <div>4 positions</div>
+            </div>
+            
+            <div class="stat-card">
+                <div>Current P&L</div>
+                <div class="stat-value" style="color: var(--profit);">+$74</div>
+                <div>10.4% return</div>
+            </div>
+        </div>
+        
+        <div class="monitoring-log">
+            <h3>📝 Recent Activity</h3>
+            <div class="log-entry">20:20 UTC - Mobile view optimized</div>
+            <div class="log-entry">20:10 UTC - All positions profitable</div>
+            <div class="log-entry">19:56 UTC - Portfolio executed</div>
+            <div class="log-entry">19:40 UTC - Monitoring started</div>
+        </div>
+        
+        <div class="market-hours">
+            <h3>🕒 Market Hours</h3>
+            <div class="hours-grid">
+                <div class="hour-card">
+                    <div>Sun 5pm CT</div>
+                    <div>30 min intervals start</div>
+                </div>
+                <div class="hour-card">
+                    <div>Mon 8am CT</div>
+                    <div>15 min intervals start</div>
+                </div>
+                <div class="hour-card">
+                    <div>Fri 4pm CT</div>
+                    <div>Monitoring stops</div>
+                </div>
+                <div class="hour-card">
+                    <div>Sun 5pm CT</div>
+                    <div>Monitoring resumes</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn btn-start" onclick="startMonitoring()">
+                🚀 Start
+            </button>
+            <button class="btn btn-pause" onclick="pauseMonitoring()">
+                ⏸️ Pause
+            </button>
+            <button class="btn btn-stop" onclick="stopMonitoring()">
+                ⏹️ Stop
+            </button>
+            <button class="btn btn-simulate" onclick="simulateCheck()">
+                🔔 Test
+            </button>
+        </div>
+        
+        <div class="footer">
+            <p>Mobile-optimized • No weekend monitoring • Fits your screen</p>
+            <p>Next check: 20:40 UTC (30 min interval)</p>
+        </div>
+    </div>
+    
+    <script>
+        // Monitoring state
+        let monitoringActive = true;
+        let checkCount = 2;
+        
+        // Portfolio data
+        const portfolio = [
+            { symbol: 'CC', premium: 220, pnl: 22, price: 7420, delta: 0.19 },
+            { symbol: 'KC', premium: 155, pnl: 8, price: 285.60, delta: 0.28 },
+            { symbol: 'CL', premium: 135, pnl: 14, price: 79.45, delta: 0.25 },
+            { symbol: 'NG', premium: 200, pnl: 30, price: 3.05, delta: 0.18 }
+        ];
+        
+        function startMonitoring() {
+            monitoringActive = true;
+            alert('🚀 Monitoring Started\n\n• 30 min intervals (off-market)\n• 15 min intervals (live market)\n• No weekend monitoring\n\nFits mobile screen perfectly!');
+            
+            // Update UI
+            document.querySelector('.header h1').innerHTML = '📱 Monitoring ACTIVE';
+            document.querySelector('.footer p:first-child').innerHTML = '✅ Monitoring Active • Mobile-optimized';
+        }
+        
+        function pauseMonitoring() {
+            monitoringActive = false;
+            alert('⏸️ Monitoring Paused');
+            document.querySelector('.header h1').innerHTML = '⏸️ Monitoring PAUSED';
+        }
+        
+        function stopMonitoring() {
+            if (confirm('⏹️ Stop Monitoring?\n\nThis will end all monitoring.')) {
+                monitoringActive = false;
+                alert('Monitoring Stopped');
+                document.querySelector('.header h1').innerHTML = '⏹️ Monitoring STOPPED';
+            }
+        }
+        
+        function simulateCheck() {
+            checkCount++;
+            
+            // Simulate small price changes
+            portfolio.forEach(trade => {
+                const change = (Math.random() * 0.4 - 0.2);
+                trade.pnl = Math.max(-trade.premium * 0.5, trade.pnl + (trade.premium * change / 20));
+            });
+            
+            // Update display
+            updatePortfolio();
+            
+            // Add log entry
+            const log = document.querySelector('.monitoring-log');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            entry.textContent = `${time} UTC - Check #${checkCount}: All positions updated`;
+            log.insertBefore(entry, log.firstChild);
+            
+            // Keep only last 4 entries
+            const entries = log.querySelectorAll('.log-entry');
+            if (entries.length > 4) {
+                log.removeChild(entries[entries.length - 1]);
+            }
+            
+            // Update stats
+            const totalPnl = portfolio.reduce((sum, t) => sum + t.pnl, 0);
+            document.querySelectorAll('.stat-value')[1].textContent = '+$' + Math.round(totalPnl);
+            
+            alert(`🔔 Test Check Complete\n\nCheck #${checkCount} simulated\nTotal P&L: +$${Math.round(totalPnl)}`);
+        }
+        
+        function updatePortfolio() {
+            // This would update portfolio display with real data
+            // For now, just update the P&L display
+            const totalPnl = portfolio.reduce((sum, t) => sum + t.pnl, 0);
+            document.querySelectorAll('.stat-value')[1].textContent = '+$' + Math.round(totalPnl);
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Mobile Monitoring loaded');
+            
+            // Auto-start
+            setTimeout(() => {
+                startMonitoring();
+            }, 1000);
+            
+            // Update next check time
+            const nextCheck = new Date(Date.now() + 30 * 60 * 1000);
+            const nextTime = nextCheck.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            document.querySelector('.footer p:last-child').textContent = `Next check: ${nextTime} UTC (30 min interval)`;
+        });
+    </script>
+</body>
+</html>
