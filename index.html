@@ -170,8 +170,8 @@
         <div class="dashboard">
             <div class="card">
                 <h2>Market Data <span id="market-time" style="font-size: 0.8em; color: #94a3b8;"></span></h2>
-                <div id="market-data">Loading...</div>
-                <button class="btn" onclick="loadMarketData()">Refresh</button>
+                <div id="market-data">Loading market data...</div>
+                <button class="btn" onclick="loadMarketData()">Refresh Market</button>
                 <div style="margin-top: 10px; font-size: 0.8em; color: #94a3b8;">
                     Auto-refresh: <span id="countdown">30</span>s
                 </div>
@@ -179,20 +179,20 @@
             
             <div class="card">
                 <h2>Weather <span id="weather-time" style="font-size: 0.8em; color: #94a3b8;"></span></h2>
-                <div id="weather-data">Loading...</div>
-                <button class="btn" onclick="loadWeather()">Refresh</button>
+                <div id="weather-data">Loading weather data...</div>
+                <button class="btn" onclick="loadWeather()">Refresh Weather</button>
             </div>
             
             <div class="card">
                 <h2>System Status</h2>
-                <div id="system-status">Checking...</div>
-                <button class="btn" onclick="checkSystem()">Check</button>
+                <div id="system-status">Checking system status...</div>
+                <button class="btn" onclick="checkSystem()">Check Status</button>
             </div>
             
             <div class="card">
                 <h2>Trading Tasks</h2>
-                <div id="tasks">Loading...</div>
-                <button class="btn" onclick="loadTasks()">Refresh</button>
+                <div id="tasks">Loading tasks...</div>
+                <button class="btn" onclick="loadTasks()">Refresh Tasks</button>
             </div>
         </div>
         
@@ -208,121 +208,96 @@
                 <h2 id="modal-title" style="margin: 0;">Symbol Details</h2>
                 <button onclick="closeModal()" style="background: none; border: none; color: #94a3b8; font-size: 1.5em; cursor: pointer;">×</button>
             </div>
-            <div id="modal-content">
-                Loading...
+            <div id="modal-body">
+                Loading symbol details...
             </div>
         </div>
     </div>
 
     <script>
-        // Mock data for demonstration
-        const MOCK_DATA = {
-            market: {
-                futures: {
-                    es: { price: 7125.50, change: 15.25, changePercent: 0.21, high: 7132.75, low: 7105.25, name: "S&P 500" },
-                    nq: { price: 18350.25, change: 42.75, changePercent: 0.23, high: 18375.50, low: 18295.00, name: "NASDAQ" },
-                    rty: { price: 2450.75, change: 8.25, changePercent: 0.34, high: 2455.25, low: 2442.50, name: "Russell 2000" },
-                    ym: { price: 39500.00, change: 125.00, changePercent: 0.32, high: 39550.00, low: 39375.00, name: "Dow Jones" },
-                    gc: { price: 2350.80, change: 12.50, changePercent: 0.53, high: 2355.25, low: 2342.75, name: "Gold" },
-                    si: { price: 28.45, change: 0.35, changePercent: 1.25, high: 28.60, low: 28.20, name: "Silver" },
-                    cl: { price: 79.25, change: -0.75, changePercent: -0.94, high: 80.50, low: 78.75, name: "Crude Oil" },
-                    ng: { price: 2.85, change: 0.05, changePercent: 1.79, high: 2.88, low: 2.82, name: "Natural Gas" }
-                },
-                commodities: {
-                    kc: { price: 285.60, change: 3.25, changePercent: 1.15, high: 287.25, low: 283.50, name: "Coffee" },
-                    sb: { price: 22.15, change: 0.35, changePercent: 1.61, high: 22.40, low: 21.95, name: "Sugar" },
-                    zc: { price: 485.25, change: -2.75, changePercent: -0.56, high: 488.50, low: 483.75, name: "Corn" },
-                    zs: { price: 1250.75, change: 8.25, changePercent: 0.66, high: 1255.00, low: 1245.50, name: "Soybeans" },
-                    ct: { price: 85.40, change: 0.75, changePercent: 0.89, high: 86.25, low: 84.95, name: "Cotton" },
-                    oj: { price: 185.30, change: 2.50, changePercent: 1.37, high: 186.75, low: 183.50, name: "Orange Juice" }
-                }
-            },
-            weather: {
-                brazil: { temp: 28, condition: "Sunny", rain: "10%", forecast: "Dry week ahead - Coffee harvest good" },
-                usa_midwest: { temp: 22, condition: "Partly Cloudy", rain: "30%", forecast: "Scattered showers - Corn planting delayed" },
-                europe: { temp: 18, condition: "Rainy", rain: "80%", forecast: "Wet conditions - Wheat harvest affected" },
-                australia: { temp: 32, condition: "Hot", rain: "5%", forecast: "Heat wave - Wheat yield concerns" },
-                vietnam: { temp: 30, condition: "Humid", rain: "40%", forecast: "Good Robusta coffee growing conditions" }
-            },
-            system: {
-                status: "online",
-                version: "3.0",
-                server: "Mission Control Mock API",
-                note: "Real API connection pending network configuration"
-            },
+        // Simple mock data
+        const mockData = {
+            futures: [
+                { symbol: "ES", name: "S&P 500", price: 7125.50, change: 15.25, changePercent: 0.21 },
+                { symbol: "NQ", name: "NASDAQ", price: 18350.25, change: 42.75, changePercent: 0.23 },
+                { symbol: "RTY", name: "Russell 2000", price: 2450.75, change: 8.25, changePercent: 0.34 },
+                { symbol: "GC", name: "Gold", price: 2350.80, change: 12.50, changePercent: 0.53 }
+            ],
+            commodities: [
+                { symbol: "KC", name: "Coffee", price: 285.60, change: 3.25, changePercent: 1.15 },
+                { symbol: "SB", name: "Sugar", price: 22.15, change: 0.35, changePercent: 1.61 },
+                { symbol: "CL", name: "Crude Oil", price: 79.25, change: -0.75, changePercent: -0.94 }
+            ],
+            weather: [
+                { region: "Brazil", temp: 28, condition: "Sunny", rain: "10%", forecast: "Good for coffee harvest" },
+                { region: "Vietnam", temp: 30, condition: "Humid", rain: "40%", forecast: "Ideal Robusta conditions" },
+                { region: "USA Midwest", temp: 22, condition: "Cloudy", rain: "30%", forecast: "Corn planting weather" }
+            ],
             tasks: [
-                { id: 1, title: "Check Vietnamese coffee exports", status: "todo", priority: "high" },
-                { id: 2, title: "Review weather impact on commodities", status: "in-progress", priority: "medium" },
-                { id: 3, title: "Monitor news.laodong.vn for market news", status: "todo", priority: "high" },
-                { id: 4, title: "Update trading journal", status: "done", priority: "low" }
+                { title: "Monitor Vietnamese coffee exports", status: "pending", priority: "high" },
+                { title: "Check weather impact on commodities", status: "in-progress", priority: "medium" },
+                { title: "Review news.laodong.vn for market updates", status: "pending", priority: "high" }
             ]
         };
-        
-        let refreshCountdown = 30;
-        let countdownInterval;
-        
-        // Format numbers
+
+        // Format price
         function formatPrice(price) {
-            return new Intl.NumberFormat('en-US', { minimumFractionDigits: 2 }).format(price);
+            return price.toLocaleString('en-US', { minimumFractionDigits: 2 });
         }
-        
+
         // Update time
         function updateTime(elementId) {
             const now = new Date();
-            document.getElementById(elementId).textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            document.getElementById(elementId).textContent = timeStr;
         }
-        
+
         // Countdown timer
+        let countdown = 30;
         function startCountdown() {
-            if (countdownInterval) clearInterval(countdownInterval);
-            countdownInterval = setInterval(() => {
-                refreshCountdown--;
-                document.getElementById('countdown').textContent = refreshCountdown;
-                if (refreshCountdown <= 0) {
-                    refreshCountdown = 30;
+            const countdownEl = document.getElementById('countdown');
+            setInterval(() => {
+                countdown--;
+                if (countdown <= 0) {
+                    countdown = 30;
                     loadMarketData();
                     loadWeather();
                 }
+                countdownEl.textContent = countdown;
             }, 1000);
         }
-        
+
         // Load market data
         function loadMarketData() {
+            updateTime('market-time');
             const container = document.getElementById('market-data');
             
-            updateTime('market-time');
-            refreshCountdown = 30;
-            
-            let html = '';
-            
-            // Futures
-            html += '<div style="margin-bottom: 15px;"><strong>FUTURES</strong></div>';
-            Object.entries(MOCK_DATA.market.futures).forEach(([symbol, info]) => {
-                const isUp = info.change >= 0;
+            let html = '<div style="margin-bottom: 15px;"><strong>FUTURES</strong></div>';
+            mockData.futures.forEach(item => {
+                const isUp = item.change >= 0;
                 html += `
-                    <div class="symbol" onclick="showSymbol('${symbol}', 'futures')">
-                        <div>${symbol.toUpperCase()}</div>
+                    <div class="symbol" onclick="showDetails('${item.symbol}', '${item.name}', ${item.price}, ${item.change}, ${item.changePercent})">
+                        <div>${item.symbol}</div>
                         <div>
-                            <span class="price">${formatPrice(info.price)}</span>
+                            <span class="price">${formatPrice(item.price)}</span>
                             <span class="change ${isUp ? 'up' : 'down'}">
-                                ${isUp ? '+' : ''}${formatPrice(info.change)} (${isUp ? '+' : ''}${info.changePercent.toFixed(2)}%)
+                                ${isUp ? '+' : ''}${formatPrice(item.change)} (${isUp ? '+' : ''}${item.changePercent.toFixed(2)}%)
                             </span>
                         </div>
                     </div>
                 `;
             });
             
-            // Commodities
             html += '<div style="margin: 15px 0;"><strong>COMMODITIES</strong></div>';
-            Object.entries(MOCK_DATA.market.commodities).forEach(([symbol, info]) => {
-                const isUp = info.change >= 0;
+            mockData.commodities.forEach(item => {
+                const isUp = item.change >= 0;
                 html += `
-                    <div class="symbol" onclick="showSymbol('${symbol}', 'commodities')">
-                        <div>${info.name}</div>
+                    <div class="symbol" onclick="showDetails('${item.symbol}', '${item.name}', ${item.price}, ${item.change}, ${item.changePercent})">
+                        <div>${item.name}</div>
                         <div>
-                            <span class="price">${formatPrice(info.price)}</span>
+                            <span class="price">${formatPrice(item.price)}</span>
                             <span class="change ${isUp ? 'up' : 'down'}">
-                                ${isUp ? '+' : ''}${formatPrice(info.change)} (${isUp ? '+' : ''}${info.changePercent.toFixed(2)}%)
+                                ${isUp ? '+' : ''}${formatPrice(item.change)} (${isUp ? '+' : ''}${item.changePercent.toFixed(2)}%)
                             </span>
                         </div>
                     </div>
@@ -331,48 +306,47 @@
             
             container.innerHTML = html;
         }
-        
+
         // Load weather
         function loadWeather() {
+            updateTime('weather-time');
             const container = document.getElementById('weather-data');
             
-            updateTime('weather-time');
-            
             let html = '';
-            Object.entries(MOCK_DATA.weather).forEach(([region, info]) => {
+            mockData.weather.forEach(item => {
                 html += `
                     <div style="margin-bottom: 10px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 5px;">
-                        <div style="font-weight: bold;">${region.toUpperCase()}</div>
-                        <div>${info.temp}°C • ${info.condition}</div>
-                        <div style="font-size: 0.9em; color: #94a3b8;">Rain: ${info.rain} • ${info.forecast}</div>
+                        <div style="font-weight: bold;">${item.region}</div>
+                        <div>${item.temp}°C • ${item.condition} • Rain: ${item.rain}</div>
+                        <div style="font-size: 0.9em; color: #94a3b8;">${item.forecast}</div>
                     </div>
                 `;
             });
             
             container.innerHTML = html;
         }
-        
+
         // Check system
         function checkSystem() {
             const container = document.getElementById('system-status');
             container.innerHTML = `
-                <div style="color: var(--success);">✅ ${MOCK_DATA.system.status.toUpperCase()}</div>
+                <div style="color: var(--success);">✅ SYSTEM ONLINE</div>
                 <div style="margin-top: 10px;">
-                    <div>Version: ${MOCK_DATA.system.version}</div>
-                    <div>Server: ${MOCK_DATA.system.server}</div>
-                    <div>Note: ${MOCK_DATA.system.note}</div>
+                    <div>Version: 3.0</div>
+                    <div>Mode: Mock Data Demo</div>
+                    <div>Status: All systems operational</div>
                 </div>
             `;
         }
-        
+
         // Load tasks
         function loadTasks() {
             const container = document.getElementById('tasks');
             
             let html = '';
-            MOCK_DATA.tasks.forEach(task => {
-                const statusColor = task.status === 'done' ? 'var(--success)' : 
-                                  task.status === 'in-progress' ? 'var(--warning)' : 'var(--danger)';
+            mockData.tasks.forEach(task => {
+                const statusColor = task.status === 'in-progress' ? '#f59e0b' : 
+                                  task.status === 'pending' ? 'var(--danger)' : 'var(--success)';
                 html += `
                     <div style="margin-bottom: 8px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 5px;">
                         <div>${task.title}</div>
@@ -383,37 +357,34 @@
             
             container.innerHTML = html;
         }
-        
-        // Show symbol details
-        function showSymbol(symbol, type) {
-            const data = type === 'futures' ? MOCK_DATA.market.futures[symbol] : MOCK_DATA.market.commodities[symbol];
-            
-            document.getElementById('modal-title').textContent = data.name || symbol.toUpperCase();
-            document.getElementById('modal').style.display = 'flex';
-            
-            const isUp = data.change >= 0;
-            document.getElementById('modal-content').innerHTML = `
+
+        // Show details modal
+        function showDetails(symbol, name, price, change, changePercent) {
+            const isUp = change >= 0;
+            document.getElementById('modal-title').textContent = `${symbol} - ${name}`;
+            document.getElementById('modal-body').innerHTML = `
                 <div style="text-align: center; margin-bottom: 20px;">
-                    <div style="font-size: 2em; font-weight: bold;">${formatPrice(data.price)}</div>
-                    <div style="color: ${isUp ? 'var                    <div style="color: ${isUp ? 'var(--success)' : 'var(--danger)'}; font-size: 1.2em;">
-                        ${isUp ? '+' : ''}${formatPrice(data.change)} (${isUp ? '+' : ''}${data.changePercent.toFixed(2)}%)
+                    <div style="font-size: 2em; font-weight: bold;">${formatPrice(price)}</div>
+                    <div style="color: ${isUp ? 'var(--success)' : 'var(--danger)'}; font-size: 1.2em;">
+                        ${isUp ? '+' : ''}${formatPrice(change)} (${isUp ? '+' : ''}${changePercent.toFixed(2)}%)
                     </div>
                 </div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <div>Type:</div><div>${type === 'futures' ? 'Futures' : 'Commodity'}</div>
-                    <div>High:</div><div>${formatPrice(data.high)}</div>
-                    <div>Low:</div><div>${formatPrice(data.low)}</div>
-                    <div>Change:</div><div style="color: ${isUp ? 'var(--success)' : 'var(--danger)'}">${isUp ? '+' : ''}${formatPrice(data.change)}</div>
-                    <div>Change %:</div><div style="color: ${isUp ? 'var(--success)' : 'var(--danger)'}">${isUp ? '+' : ''}${data.changePercent.toFixed(2)}%</div>
+                    <div>Symbol:</div><div>${symbol}</div>
+                    <div>Name:</div><div>${name}</div>
+                    <div>Price:</div><div>${formatPrice(price)}</div>
+                    <div>Change:</div><div style="color: ${isUp ? 'var(--success)' : 'var(--danger)'}">${isUp ? '+' : ''}${formatPrice(change)}</div>
+                    <div>Change %:</div><div style="color: ${isUp ? 'var(--success)' : 'var(--danger)'}">${isUp ? '+' : ''}${changePercent.toFixed(2)}%</div>
                 </div>
             `;
+            document.getElementById('modal').style.display = 'flex';
         }
-        
+
         // Close modal
         function closeModal() {
             document.getElementById('modal').style.display = 'none';
         }
-        
+
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             loadMarketData();
@@ -441,4 +412,3 @@
     </script>
 </body>
 </html>
-EOF && echo "✅ File completed" && cp /tmp/mission-control-working.html /root/.openclaw/workspace/google-drive/Mission-Control-WORKING.html && echo "✅ Working version in Google Drive"
