@@ -395,4 +395,50 @@
             document.getElementById('modal-content').innerHTML = `
                 <div style="text-align: center; margin-bottom: 20px;">
                     <div style="font-size: 2em; font-weight: bold;">${formatPrice(data.price)}</div>
-                    <div style="color: ${isUp ? 'var(--success)' : 'var(--danger)'}; font-size
+                    <div style="color: ${isUp ? 'var                    <div style="color: ${isUp ? 'var(--success)' : 'var(--danger)'}; font-size: 1.2em;">
+                        ${isUp ? '+' : ''}${formatPrice(data.change)} (${isUp ? '+' : ''}${data.changePercent.toFixed(2)}%)
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div>Type:</div><div>${type === 'futures' ? 'Futures' : 'Commodity'}</div>
+                    <div>High:</div><div>${formatPrice(data.high)}</div>
+                    <div>Low:</div><div>${formatPrice(data.low)}</div>
+                    <div>Change:</div><div style="color: ${isUp ? 'var(--success)' : 'var(--danger)'}">${isUp ? '+' : ''}${formatPrice(data.change)}</div>
+                    <div>Change %:</div><div style="color: ${isUp ? 'var(--success)' : 'var(--danger)'}">${isUp ? '+' : ''}${data.changePercent.toFixed(2)}%</div>
+                </div>
+            `;
+        }
+        
+        // Close modal
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMarketData();
+            loadWeather();
+            checkSystem();
+            loadTasks();
+            startCountdown();
+            
+            // Auto-refresh every 30 seconds
+            setInterval(() => {
+                loadMarketData();
+                loadWeather();
+            }, 30000);
+            
+            // Close modal on ESC
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeModal();
+            });
+            
+            // Close modal on background click
+            document.getElementById('modal').addEventListener('click', (e) => {
+                if (e.target.id === 'modal') closeModal();
+            });
+        });
+    </script>
+</body>
+</html>
+EOF && echo "✅ File completed" && cp /tmp/mission-control-working.html /root/.openclaw/workspace/google-drive/Mission-Control-WORKING.html && echo "✅ Working version in Google Drive"
